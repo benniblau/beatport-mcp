@@ -39,7 +39,7 @@ BEATPORT_REFRESH_TOKEN=
 BEATPORT_TOKEN_EXPIRES_AT=
 
 # Optional — bearer token for external access
-MCP_AUTH_TOKEN=your_generated_token_here
+BEATPORT_MCP_AUTH_TOKEN=your_generated_token_here
 ```
 
 All configuration lives in `.env`. Nothing is hardcoded.
@@ -88,7 +88,7 @@ All tools return JSON.
 
 ## Bearer token authentication
 
-Set `MCP_AUTH_TOKEN` in `.env` to protect the server for external/production use. Generate a token with:
+Set `BEATPORT_MCP_AUTH_TOKEN` in `.env` to protect the server for external/production use. Generate a token with:
 
 ```bash
 python3 -c "import secrets; print(secrets.token_urlsafe(32))"
@@ -100,7 +100,7 @@ Every request must then include the header:
 Authorization: Bearer your_token
 ```
 
-Without the header (or with a wrong token) the server returns `401 Unauthorized`. If `MCP_AUTH_TOKEN` is not set, the server accepts all requests — suitable for local use behind `127.0.0.1`.
+Without the header (or with a wrong token) the server returns `401 Unauthorized`. If `BEATPORT_MCP_AUTH_TOKEN` is not set, the server accepts all requests — suitable for local use behind `127.0.0.1`.
 
 To connect Claude Code against a protected server:
 

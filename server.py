@@ -40,8 +40,8 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 mcp = FastMCP(
     "beatport-mcp",
     lifespan=app_lifespan,
-    host=os.environ.get("MCP_HOST", "127.0.0.1"),
-    port=int(os.environ.get("MCP_PORT", "8000")),
+    host=os.environ.get("BEATPORT_MCP_HOST", "127.0.0.1"),
+    port=int(os.environ.get("BEATPORT_MCP_PORT", "8000")),
 )
 
 
@@ -190,7 +190,7 @@ def main():
     from mcp.server.auth.middleware.bearer_auth import BearerAuthBackend, RequireAuthMiddleware
     from mcp.server.auth.provider import AccessToken
 
-    auth_token = os.environ.get("MCP_AUTH_TOKEN")
+    auth_token = os.environ.get("BEATPORT_MCP_AUTH_TOKEN")
 
     class StaticTokenVerifier:
         def __init__(self, expected_token: str):
@@ -215,8 +215,8 @@ def main():
 
     config = uvicorn.Config(
         app,
-        host=os.environ.get("MCP_HOST", "127.0.0.1"),
-        port=int(os.environ.get("MCP_PORT", "8000")),
+        host=os.environ.get("BEATPORT_MCP_HOST", "127.0.0.1"),
+        port=int(os.environ.get("BEATPORT_MCP_PORT", "8000")),
         log_level="info",
     )
     try:
