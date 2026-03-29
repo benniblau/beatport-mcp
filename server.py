@@ -184,34 +184,35 @@ async def get_new_releases_from_followed_artists(ctx: Context, per_artist: int =
 
 
 def main():
-    from starlette.middleware import Middleware
-    from starlette.middleware.authentication import AuthenticationMiddleware
-
-    from mcp.server.auth.middleware.bearer_auth import BearerAuthBackend, RequireAuthMiddleware
-    from mcp.server.auth.provider import AccessToken
+    from starlette.responses import JSONResponse
 
     auth_token = os.environ.get("BEATPORT_MCP_AUTH_TOKEN")
 
-    class StaticTokenVerifier:
-        def __init__(self, expected_token: str):
-            self.expected_token = expected_token
+    class BearerTokenMiddleware:
+        def __init__(self, app, token: str):
+            self.app = app
+            self.token = token
 
-        async def verify_token(self, token: str) -> AccessToken | None:
-            if token == self.expected_token:
-                return AccessToken(
-                    token=token,
-                    client_id="static",
-                    scopes=["mcp:access"],
-                    expires_at=None,
+        async def __call__(self, scope, receive, send):
+            if scope["type"] != "http":
+                await self.app(scope, receive, send)
+                return
+            headers = dict(scope.get("headers", []))
+            auth_header = headers.get(b"authorization", b"").decode()
+            if not auth_header.startswith("Bearer ") or auth_header[7:] != self.token:
+                response = JSONResponse(
+                    {"error": "invalid_token", "error_description": "Authentication required"},
+                    status_code=401,
+                    headers={"WWW-Authenticate": "Bearer"},
                 )
-            return None
+                await response(scope, receive, send)
+                return
+            await self.app(scope, receive, send)
 
     app = mcp.streamable_http_app()
 
     if auth_token:
-        verifier = StaticTokenVerifier(auth_token)
-        app.add_middleware(AuthenticationMiddleware, backend=BearerAuthBackend(verifier))
-        app = RequireAuthMiddleware(app, required_scopes=["mcp:access"])
+        app = BearerTokenMiddleware(app, auth_token)
 
     config = uvicorn.Config(
         app,
