@@ -39,6 +39,8 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[AppContext]:
 mcp = FastMCP(
     "beatport-mcp",
     lifespan=app_lifespan,
+    host=os.environ.get("MCP_HOST", "127.0.0.1"),
+    port=int(os.environ.get("MCP_PORT", "8000")),
 )
 
 

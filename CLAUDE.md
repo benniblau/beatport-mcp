@@ -43,6 +43,8 @@ Eight tools registered via `@mcp.tool()`. Each takes a `ctx: Context` param (aut
 | `BEATPORT_REFRESH_TOKEN` | No | Pre-seeded refresh token |
 | `BEATPORT_TOKEN_EXPIRES_AT` | No | Token expiry as Unix timestamp |
 | `BEATPORT_CLIENT_ID` | No | Override auto-scraped OAuth client_id |
+| `MCP_HOST` | No | Server bind address (default: `127.0.0.1`) |
+| `MCP_PORT` | No | Server port (default: `8000`) |
 
 ## Dependencies
 
