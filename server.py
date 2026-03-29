@@ -6,6 +6,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
+import uvicorn
 from dotenv import load_dotenv
 from mcp.server.fastmcp import Context, FastMCP
 
@@ -183,8 +184,43 @@ async def get_new_releases_from_followed_artists(ctx: Context, per_artist: int =
 
 
 def main():
+    from starlette.middleware import Middleware
+    from starlette.middleware.authentication import AuthenticationMiddleware
+
+    from mcp.server.auth.middleware.bearer_auth import BearerAuthBackend, RequireAuthMiddleware
+    from mcp.server.auth.provider import AccessToken
+
+    auth_token = os.environ.get("MCP_AUTH_TOKEN")
+
+    class StaticTokenVerifier:
+        def __init__(self, expected_token: str):
+            self.expected_token = expected_token
+
+        async def verify_token(self, token: str) -> AccessToken | None:
+            if token == self.expected_token:
+                return AccessToken(
+                    token=token,
+                    client_id="static",
+                    scopes=["mcp:access"],
+                    expires_at=None,
+                )
+            return None
+
+    app = mcp.streamable_http_app()
+
+    if auth_token:
+        verifier = StaticTokenVerifier(auth_token)
+        app.add_middleware(AuthenticationMiddleware, backend=BearerAuthBackend(verifier))
+        app = RequireAuthMiddleware(app, required_scopes=["mcp:access"])
+
+    config = uvicorn.Config(
+        app,
+        host=os.environ.get("MCP_HOST", "127.0.0.1"),
+        port=int(os.environ.get("MCP_PORT", "8000")),
+        log_level="info",
+    )
     try:
-        mcp.run(transport="streamable-http")
+        uvicorn.Server(config).run()
     except KeyboardInterrupt:
         pass
 

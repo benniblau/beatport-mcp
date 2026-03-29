@@ -37,6 +37,9 @@ BEATPORT_BASE_URL=https://api.beatport.com/v4
 BEATPORT_ACCESS_TOKEN=
 BEATPORT_REFRESH_TOKEN=
 BEATPORT_TOKEN_EXPIRES_AT=
+
+# Optional — bearer token for external access
+MCP_AUTH_TOKEN=your_generated_token_here
 ```
 
 All configuration lives in `.env`. Nothing is hardcoded.
@@ -82,6 +85,29 @@ Then connect to `http://127.0.0.1:8000/mcp` in the inspector UI.
 | `get_new_releases_from_followed_artists` | New releases grouped by followed artist | `per_artist` (int, default 10) |
 
 All tools return JSON.
+
+## Bearer token authentication
+
+Set `MCP_AUTH_TOKEN` in `.env` to protect the server for external/production use. Generate a token with:
+
+```bash
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+Every request must then include the header:
+
+```
+Authorization: Bearer your_token
+```
+
+Without the header (or with a wrong token) the server returns `401 Unauthorized`. If `MCP_AUTH_TOKEN` is not set, the server accepts all requests — suitable for local use behind `127.0.0.1`.
+
+To connect Claude Code against a protected server:
+
+```bash
+claude mcp add --transport http beatport-mcp http://your-host:8000/mcp \
+  --header "Authorization: Bearer your_token"
+```
 
 ## Authentication
 
