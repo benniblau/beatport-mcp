@@ -137,7 +137,10 @@ async def get_my_account(ctx: Context) -> str:
 
 
 def main():
-    mcp.run(transport="streamable-http")
+    try:
+        mcp.run(transport="streamable-http")
+    except KeyboardInterrupt:
+        pass
 
 
 if __name__ == "__main__":
