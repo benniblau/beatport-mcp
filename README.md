@@ -76,6 +76,10 @@ Then connect to `http://127.0.0.1:8000/mcp` in the inspector UI.
 | `get_artist` | Get artist details by ID | `artist_id` (int) |
 | `get_label` | Get label details by ID | `label_id` (int) |
 | `get_my_account` | Get current user info | (none) |
+| `get_followed_labels` | List all labels you follow | `per_page` (int, default 100) |
+| `get_followed_artists` | List all artists you follow | `per_page` (int, default 100) |
+| `get_new_releases_from_followed_labels` | New releases grouped by followed label | `per_label` (int, default 10) |
+| `get_new_releases_from_followed_artists` | New releases grouped by followed artist | `per_artist` (int, default 10) |
 
 All tools return JSON.
 

@@ -30,7 +30,7 @@ The `client_id` is scraped from Beatport's docs page JS bundles at `https://api.
 
 ### Tools (`server.py`)
 
-Eight tools registered via `@mcp.tool()`. Each takes a `ctx: Context` param (auto-excluded from MCP schema) to access the shared `BeatportClient` via `ctx.request_context.lifespan_context.client`.
+Twelve tools registered via `@mcp.tool()`. Each takes a `ctx: Context` param (auto-excluded from MCP schema) to access the shared `BeatportClient` via `ctx.request_context.lifespan_context.client`.
 
 ### Environment variables
 
@@ -56,8 +56,11 @@ Eight tools registered via `@mcp.tool()`. Each takes a `ctx: Context` param (aut
 - `GET /auth/o/authorize/` — OAuth authorize (returns code via 302)
 - `POST /auth/o/token/` — token exchange and refresh
 - `GET /my/account/` — current user
+- `GET /my/beatport/labels/` — labels followed by current user
+- `GET /my/beatport/artists/` — artists followed by current user
 - `GET /catalog/search` — search tracks/releases
 - `GET /catalog/tracks/{id}/` — track detail
+- `GET /catalog/releases/` — release list (supports `label_id`, `artists_id`, `ordering` filters)
 - `GET /catalog/releases/{id}/` — release detail
 - `GET /catalog/releases/{id}/tracks/` — release tracklist
 - `GET /catalog/artists/{id}/` — artist detail
