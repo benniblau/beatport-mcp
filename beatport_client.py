@@ -197,6 +197,40 @@ class BeatportClient:
     async def get_my_account(self) -> dict:
         return await self._api_get("/my/account/")
 
+    async def get_followed_labels(self, per_page: int = 100) -> list:
+        return await self._api_get("/my/beatport/labels/", per_page=per_page)
+
+    async def get_followed_artists(self, per_page: int = 100) -> list:
+        return await self._api_get("/my/beatport/artists/", per_page=per_page)
+
+    async def get_new_releases_from_followed_labels(self, per_label: int = 10) -> list:
+        labels = await self._api_get("/my/beatport/labels/", per_page=100)
+        results = []
+        for label in labels:
+            releases = await self._api_get(
+                "/catalog/releases/",
+                label_id=label["id"],
+                per_page=per_label,
+                ordering="-publish_date",
+            )
+            items = releases if isinstance(releases, list) else releases.get("results", [])
+            results.append({"label": {"id": label["id"], "name": label["name"]}, "releases": items})
+        return results
+
+    async def get_new_releases_from_followed_artists(self, per_artist: int = 10) -> list:
+        artists = await self._api_get("/my/beatport/artists/", per_page=100)
+        results = []
+        for artist in artists:
+            releases = await self._api_get(
+                "/catalog/releases/",
+                artists_id=artist["id"],
+                per_page=per_artist,
+                ordering="-publish_date",
+            )
+            items = releases if isinstance(releases, list) else releases.get("results", [])
+            results.append({"artist": {"id": artist["id"], "name": artist["name"]}, "releases": items})
+        return results
+
     async def search_tracks(self, query: str, per_page: int = 10) -> list:
         return await self._api_get("/catalog/search", q=query, type="tracks", per_page=per_page)
 

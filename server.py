@@ -136,6 +136,52 @@ async def get_my_account(ctx: Context) -> str:
     return json.dumps(result, indent=2, default=str)
 
 
+@mcp.tool()
+async def get_followed_labels(ctx: Context, per_page: int = 100) -> str:
+    """Get all Beatport labels followed by the current user.
+
+    Returns a list of labels with id, name, and other metadata.
+    """
+    client = _get_client(ctx)
+    result = await client.get_followed_labels(per_page=per_page)
+    return json.dumps(result, indent=2, default=str)
+
+
+@mcp.tool()
+async def get_followed_artists(ctx: Context, per_page: int = 100) -> str:
+    """Get all Beatport artists followed by the current user.
+
+    Returns a list of artists with id, name, and other metadata.
+    """
+    client = _get_client(ctx)
+    result = await client.get_followed_artists(per_page=per_page)
+    return json.dumps(result, indent=2, default=str)
+
+
+@mcp.tool()
+async def get_new_releases_from_followed_labels(ctx: Context, per_label: int = 10) -> str:
+    """Get the most recent releases from all labels followed by the current user.
+
+    Returns a list of objects grouped by label, each containing label info and a list of releases
+    sorted by publish_date descending.
+    """
+    client = _get_client(ctx)
+    result = await client.get_new_releases_from_followed_labels(per_label=per_label)
+    return json.dumps(result, indent=2, default=str)
+
+
+@mcp.tool()
+async def get_new_releases_from_followed_artists(ctx: Context, per_artist: int = 10) -> str:
+    """Get the most recent releases from all artists followed by the current user.
+
+    Returns a list of objects grouped by artist, each containing artist info and a list of releases
+    sorted by publish_date descending.
+    """
+    client = _get_client(ctx)
+    result = await client.get_new_releases_from_followed_artists(per_artist=per_artist)
+    return json.dumps(result, indent=2, default=str)
+
+
 def main():
     try:
         mcp.run(transport="streamable-http")
